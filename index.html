@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>পত্র প্রস্তুতকরণ | পরীক্ষা নিয়ন্ত্রক বরাবর | স্বাক্ষর ডান পাশে + সেন্টার লেখা (সব লাইন)</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #eef2f5;
+            font-family: 'Segoe UI', 'Nikosh', 'Bangla', 'Kalpurush', 'Siyam Rupali', 'Noto Sans Bengali', Arial, sans-serif;
+            padding: 24px 20px;
+            min-height: 100vh;
+        }
+
+        /* dashboard split screen : left panel (dashboard) + right panel (preview) */
+        .dashboard-layout {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 24px;
+            max-width: 1500px;
+            margin: 0 auto;
+        }
+
+        /* LEFT PANEL: dashboard with controls */
+        .dashboard-panel {
+            flex: 1.2;
+            min-width: 280px;
+            background: #ffffff;
+            border-radius: 28px;
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.08);
+            padding: 1.5rem 1.2rem;
+            height: fit-content;
+            position: sticky;
+            top: 24px;
+            transition: all 0.2s;
+        }
+
+        .dashboard-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #0f3b5c;
+            border-bottom: 3px solid #e2e8f0;
+            padding-bottom: 0.6rem;
+            margin-bottom: 1.6rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .control-group {
+            margin-bottom: 1.8rem;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .control-group label {
+            font-weight: 700;
+            color: #1e293b;
+            font-size: 0.85rem;
+            letter-spacing: 0.3px;
+            background: #f1f5f9;
+            padding: 5px 10px;
+            border-radius: 30px;
+            display: inline-block;
+            width: fit-content;
+        }
+
+        .control-group input {
+            padding: 12px 14px;
+            border: 1.5px solid #cbd5e1;
+            border-radius: 20px;
+            font-size: 0.95rem;
+            font-family: monospace, 'Segoe UI', 'Bangla', sans-serif;
+            background: #fefefe;
+            transition: 0.2s;
+            width: 100%;
+            font-weight: 500;
+        }
+
+        .control-group input:focus {
+            outline: none;
+            border-color: #0f3b5c;
+            box-shadow: 0 0 0 3px rgba(15, 59, 92, 0.15);
+        }
+
+        .reset-btn-dash {
+            background: #e2e8f0;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 40px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            cursor: pointer;
+            width: 100%;
+            transition: 0.2s;
+            color: #1e293b;
+            margin-top: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .reset-btn-dash:hover {
+            background: #cbd5e1;
+            transform: scale(0.98);
+        }
+
+        .info-note {
+            margin-top: 24px;
+            background: #f8fafc;
+            padding: 14px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            color: #475569;
+            text-align: center;
+            border: 1px dashed #cbd5e1;
+        }
+
+        /* RIGHT PANEL: preview */
+        .preview-panel {
+            flex: 2.2;
+            min-width: 480px;
+            background: #e9eef3;
+            border-radius: 28px;
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+
+        .preview-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 12px;
+            padding: 0 8px;
+        }
+
+        .preview-header h3 {
+            font-size: 0.9rem;
+            font-weight: 600;
+            background: #fff;
+            padding: 4px 14px;
+            border-radius: 50px;
+            color: #0f3b5c;
+        }
+
+        .print-btn {
+            background: #2c5f8a;
+            border: none;
+            color: white;
+            padding: 6px 16px;
+            border-radius: 40px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .print-btn:hover {
+            background: #1e405e;
+        }
+
+        /* letter card */
+        .letter-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+        }
+
+        .letter-paper {
+            padding: 2rem 2rem 2rem 2rem;
+            background: #fffef7;
+            line-height: 1.55;
+            color: #1e2a3a;
+        }
+
+        /* left alignment for receiver, subject, salutation, body */
+        .receiver-block {
+            text-align: left;
+            margin-bottom: 1.8rem;
+        }
+        .receiver-block p {
+            margin: 0.2rem 0;
+        }
+        .subject-line {
+            margin: 1.2rem 0 1rem 0;
+            font-weight: 700;
+            background: #ffffff;
+            text-align: left;
+        }
+        .salutation {
+            text-align: left;
+            margin: 0.8rem 0 0.3rem;
+        }
+        .body-text {
+            text-align: justify;
+            margin: 0.8rem 0;
+        }
+        .body-text p {
+            margin-bottom: 0.7rem;
+        }
+        
+        /* SIGNATURE BLOCK - RIGHT ALIGNED + CENTER TEXT */
+        .signature-block {
+            margin-top: 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            text-align: center;
+            border-top: 1px dashed #cbd5e1;
+            padding-top: 1.2rem;
+        }
+        .signature-block > div {
+            width: auto;
+            max-width: 100%;
+        }
+        .signature-line {
+            margin-top: 0.3rem;
+            font-weight: 600;
+        }
+        .institute-details {
+            margin-top: 0.6rem;
+            font-size: 0.9rem;
+        }
+        
+        .footer-note {
+            text-align: center;
+            margin-top: 1.8rem;
+            font-size: 0.7rem;
+            color: #4b5563;
+            border-top: 1px solid #e2e8f0;
+            padding-top: 0.8rem;
+        }
+
+        @media (max-width: 880px) {
+            .dashboard-layout {
+                flex-direction: column;
+            }
+            .dashboard-panel {
+                position: static;
+            }
+            .preview-panel {
+                min-width: auto;
+            }
+        }
+
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+                margin: 0;
+            }
+            .dashboard-panel, .preview-header, .print-btn, .info-note {
+                display: none;
+            }
+            .preview-panel {
+                background: white;
+                padding: 0;
+                margin: 0;
+                box-shadow: none;
+            }
+            .letter-card {
+                box-shadow: none;
+            }
+            .letter-paper {
+                padding: 0.2in;
+            }
+            @page {
+                size: A4;
+                margin: 0.8in 0.8in;
+            }
+            .signature-block {
+                align-items: flex-end !important;
+                text-align: center !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="dashboard-layout">
+    <!-- LEFT: Dashboard -->
+    <div class="dashboard-panel">
+        <div class="dashboard-title">
+            📋 পত্র কনফিগারেশন
+        </div>
+        <div class="control-group">
+            <label>📅 সেশন / পর্ব (বাংলা)</label>
+            <input type="text" id="sessionInput" value="জুলাই-ডিসেম্বর/২০২৪" placeholder="যেমন: জানুয়ারি-জুন/২০২৫">
+        </div>
+        <div class="control-group">
+            <label>📆 পরীক্ষার তারিখ (হার্ডকপি জমার তারিখ)</label>
+            <input type="text" id="examDateInput" value="০৭/০২/২০২৫ ইং" placeholder="dd/mm/yyyy ইং">
+        </div>
+        <button class="reset-btn-dash" id="resetBtn">
+            ⟳ মূল ফরম্যাটে ফিরুন
+        </button>
+        <div class="info-note">
+            ⚡ পরিবর্তন সাথে সাথে ডানদিকে প্রিভিউ আপডেট হবে ।<br>
+            🖨️ প্রিন্ট করতে উপরে "প্রিন্ট প্রিভিউ / প্রিন্ট" বাটন ব্যবহার করুন।
+        </div>
+    </div>
+
+    <!-- RIGHT: Live Preview -->
+    <div class="preview-panel">
+        <div class="preview-header">
+            <h3>📄 লাইভ প্রিভিউ (A4 স্টাইল)</h3>
+            <button class="print-btn" id="printPreviewBtn">🖨️ প্রিন্ট / PDF</button>
+        </div>
+        <div class="letter-card" id="previewCard">
+            <div class="letter-paper" id="liveLetterPaper">
+                <div class="receiver-block">
+                    <p><strong>বরাবর,</strong></p>
+                    <p>পরীক্ষা নিয়ন্ত্রক</p>
+                    <p>বাংলাদেশ কারিগরি শিক্ষা বোর্ড</p>
+                    <p>শেরে বাংলা নগর, আগারগাঁও</p>
+                    <p>ঢাকা-১২০৭</p>
+                </div>
+
+                <div class="subject-line" id="subjectLinePreview">
+                    বিষয়ঃ বেসিক ট্রেড <span id="sessionSpanSub">জুলাই-ডিসেম্বর/২০২৪</span> সেশনের পরীক্ষায় পরীক্ষার্থীদের হাজিরা সীট, TC, PC ও PF অনলাইন নম্বরের হার্ডকপি জমাদান প্রসংগে।
+                </div>
+
+                <div class="salutation">জনাব,</div>
+
+                <div class="body-text">
+                    <p>বিনীত নিবেদন এই যে, <strong>কেন্দ্রঃ বাবুল কম্পিউটার ট্রেনিং ইনস্টিটিউট (বিসিটিআই) কেন্দ্র কোডঃ ২৫০৮০ মনিরামপুর, শাহজাদপুর, সিরাজগঞ্জ</strong> - এ গত <strong id="dateSpanPreview">০৭/০২/২০২৫ ইং</strong> তারিখে অনুষ্ঠিত জাতীয় দক্ষতামান বেসিক ট্রেড <strong id="sessionSpanBodyPrev">জুলাই-ডিসেম্বর/২০২৪</strong> সেশনের পরীক্ষায় পরীক্ষার্থীদের হাজিরা সীট, TC, PC ও PF অনলাইন নম্বরের হার্ডকপি জমা দেওয়া হলো।</p>
+                    <p>পরবর্তী ব্যবস্থা গ্রহণ করে বাধিত করবেন ।</p>
+                </div>
+
+                <!-- SIGNATURE SECTION : সব লাইন ডান পাশে + সেন্টার align -->
+                <div class="signature-block">
+                    <div class="institute-details">
+                        নিবেদক,<br>
+                        পরিচালক<br>
+                        ও<br>
+                        ভারপ্রাপ্ত কর্মকর্তা<br>
+                        বাবুল কম্পিউটার ট্রেনিং ইনস্টিটিউট<br>
+                        কেন্দ্র কোডঃ ২৫০৮০<br>
+                        মনিরামপুর বাজার, শাহজাদপুর, সিরাজগঞ্জ।
+                    </div>
+                </div>
+
+                <div class="footer-note">
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // DOM elements
+    const sessionInput = document.getElementById('sessionInput');
+    const examDateInput = document.getElementById('examDateInput');
+    const resetBtn = document.getElementById('resetBtn');
+    const printBtn = document.getElementById('printPreviewBtn');
+
+    const sessionSpanSub = document.getElementById('sessionSpanSub');
+    const sessionSpanBodyPrev = document.getElementById('sessionSpanBodyPrev');
+    const dateSpanPreview = document.getElementById('dateSpanPreview');
+    const subjectLinePreview = document.getElementById('subjectLinePreview');
+
+    const DEFAULT_SESSION = "জুলাই-ডিসেম্বর/২০২৪";
+    const DEFAULT_DATE = "০৭/০২/২০২৫ ইং";
+
+    function updatePreview() {
+        let newSession = sessionInput.value.trim();
+        let newDate = examDateInput.value.trim();
+
+        if (newSession === "") newSession = "______";
+        if (newDate === "") newDate = "______";
+
+        sessionSpanSub.innerText = newSession;
+        sessionSpanBodyPrev.innerText = newSession;
+        dateSpanPreview.innerText = newDate;
+
+        const updatedSubject = `বিষয়ঃ বেসিক ট্রেড ${newSession} সেশনের পরীক্ষায় পরীক্ষার্থীদের হাজিরা সীট, TC, PC ও PF অনলাইন নম্বরের হার্ডকপি জমাদান প্রসংগে।`;
+        subjectLinePreview.innerText = updatedSubject;
+    }
+
+    sessionInput.addEventListener('input', updatePreview);
+    examDateInput.addEventListener('input', updatePreview);
+
+    function resetToDefault() {
+        sessionInput.value = DEFAULT_SESSION;
+        examDateInput.value = DEFAULT_DATE;
+        updatePreview();
+    }
+    resetBtn.addEventListener('click', resetToDefault);
+
+    function printLetter() {
+        const printContent = document.getElementById('previewCard').cloneNode(true);
+        const printWindow = window.open('', '_blank', 'width=900,height=700');
+        printWindow.document.write(`
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <meta charset="UTF-8">
+                <title>পত্র - পরীক্ষা নিয়ন্ত্রক বরাবর</title>
+                <style>
+                    * { margin: 0; padding: 0; box-sizing: border-box; }
+                    body {
+                        font-family: 'Segoe UI', 'Nikosh', 'Bangla', 'Kalpurush', 'Siyam Rupali', 'Noto Sans Bengali', Arial, sans-serif;
+                        background: white;
+                        padding: 0;
+                        margin: 0 auto;
+                    }
+                    @page {
+                        size: A4;
+                        margin: 1in 1in 0.8in 1in;
+                    }
+                    .print-letter {
+                        background: white;
+                        width: 100%;
+                        line-height: 1.55;
+                        color: #1e2a3a;
+                    }
+                    .receiver-block { text-align: left; margin-bottom: 1.8rem; }
+                    .receiver-block p { margin: 0.2rem 0; }
+                    .subject-line {
+                        margin: 1.2rem 0 1rem 0;
+                        font-weight: 700;
+                        text-align: left;
+                    }
+                    .salutation { text-align: left; margin: 0.8rem 0 0.3rem; }
+                    .body-text { text-align: justify; margin: 0.8rem 0; }
+                    .body-text p { margin-bottom: 0.7rem; }
+                    .signature-block {
+                        margin-top: 2rem;
+                        display: flex;
+                        flex-direction: column;
+                        align-items: flex-end;
+                        text-align: center;
+                        border-top: 1px dashed #cbd5e1;
+                        padding-top: 1.2rem;
+                    }
+                    .institute-details { margin-top: 0.6rem; font-size: 0.9rem; }
+                    .footer-note {
+                        text-align: center;
+                        margin-top: 1.8rem;
+                        font-size: 0.7rem;
+                        color: #4b5563;
+                        border-top: 1px solid #e2e8f0;
+                        padding-top: 0.8rem;
+                    }
+                </style>
+            </head>
+            <body>
+                <div class="print-letter">
+                    ${printContent.innerHTML}
+                </div>
+            </body>
+            </html>
+        `);
+        printWindow.document.close();
+        printWindow.focus();
+        printWindow.print();
+    }
+
+    printBtn.addEventListener('click', printLetter);
+    updatePreview();
+
+    window.addEventListener('DOMContentLoaded', () => {
+        if (!sessionInput.value.trim()) sessionInput.value = DEFAULT_SESSION;
+        if (!examDateInput.value.trim()) examDateInput.value = DEFAULT_DATE;
+        updatePreview();
+    });
+</script>
+</body>
+</html>
